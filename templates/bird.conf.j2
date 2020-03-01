@@ -1,0 +1,49 @@
+# {{ ansible_managed }}
+
+{% for proto_type, protos in bird_config_default.protocols.items() %}
+{% if protos is string %}
+protocol {{ proto_type }} {
+  {{ protos | indent(2) }}
+}
+
+{% endif %}
+{% endfor %}
+
+{% for peer_name, peer in bird_config_peers.items() %}
+protocol {{ peer.proto }} {{ peer_name }} {
+  local as {{ peer.bgp_asn_local }};
+  neighbor {{ peer.bgp_ip_remote }} as {{ peer.bgp_asn_remote }};
+{% if peer.bgp_authkey is defined and peer.bgp_authkey %}
+  password "{{ peer.bgp_authkey }}";
+{% endif %}
+  import {{ peer.import }};
+  export {{ peer.export }};
+  add paths tx;
+  add paths rx;
+{% if peer.bfd_interface is defined and peer.bfd_interface %}
+  bfd on;
+{% endif %}
+  direct;
+}
+
+{% endfor %}
+protocol bfd {
+{% for peer_name, peer in bird_config_peers.items() %}
+{%- if peer.bfd_interface is defined and peer.bfd_interface %}
+  interface "{{ peer.bfd_interface }}" {
+    min rx interval 1000 ms;
+    min tx interval 1000 ms;
+    idle tx interval 1000 ms;
+  };
+{% endif %}
+{% endfor %}
+  multihop {
+    interval 200 ms;
+    multiplier 10;
+  };
+{% for peer_name, peer in bird_config_peers.items() %}
+{%- if peer.bfd_interface is defined  and peer.bfd_interface%}
+  neighbor {{ peer.bgp_ip_remote }};
+{% endif %}
+{% endfor %}
+}

@@ -1,0 +1,17 @@
+---
+
+bird_config_bgp_asn_local: 
+
+bird_config_default:
+  protocols:
+    direct: |
+      interface "eth1" "eth2*";
+    kernel: |
+      persist;
+      scan time 20;
+      import all;
+      export all;
+    device: |
+      scan time 5;
+
+bird_config_peers: {}

@@ -1,0 +1,15 @@
+---
+
+- tags: config
+  block:
+
+    #------------------------------------------------------------------------------#
+    # roll out config files
+    #------------------------------------------------------------------------------#
+
+    - name: config | deploy main config file
+      template:
+        src: bird.conf.j2
+        dest: /etc/bird.conf
+      notify: systemd | reload bird
+      when: ansible_virtualization_type != "docker"

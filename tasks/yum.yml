@@ -1,0 +1,37 @@
+---
+
+- tags:
+    - yum
+    - packages
+  block:
+
+    #--------------------------------------------------------------------------#
+    # enable EPEL
+    #--------------------------------------------------------------------------#
+
+    - name: yum | enable EPEL in Amazon Linux Extras
+      shell: amazon-linux-extras enable epel
+      when: ansible_distribution == 'Amazon'
+
+    - name: yum | install EPEL package
+      yum:
+        name: epel-release
+        state: present
+        update_cache: true
+      when: ansible_distribution == 'Amazon'
+
+    - name: yum | install EPEL package
+      yum:
+        name: 'https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm'
+        state: present
+        update_cache: true
+      when: ansible_distribution != 'Amazon'
+
+    #------------------------------------------------------------------------------#
+    # install package
+    #------------------------------------------------------------------------------#
+
+    - name: yum | install package
+      yum:
+        name: bird
+        state: present

@@ -1,0 +1,15 @@
+---
+
+- tags: systemd
+  block:
+
+    #------------------------------------------------------------------------------#
+    # enable and start systemd unit
+    #------------------------------------------------------------------------------#
+
+    - name: systemd | enable and start systemd unit
+      systemd:
+        name: bird
+        enabled: true
+        state: started
+      when: ansible_virtualization_type != "docker"
